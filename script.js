@@ -1,27 +1,29 @@
-import itemsDB from "./items.json";
+import {
+  items,
+  cartItems,
+  displayAmount,
+  renderCart,
+  deleteCartItemHandler,
+} from "./cart";
 
-const items = Array.from(itemsDB);
-
-const storeItems = document.querySelector(".cart-items");
-const cartItems = {};
+const storeItems = document.querySelector(".store-items");
 
 for (let item of items) {
   const newItem = document
-    .querySelector("#cart-item-template")
+    .querySelector("#store-item-template")
     .content.cloneNode(true);
-  let src = `https://dummyimage.com/420x260/${item.imageColor}/${item.imageColor}`;
+  const src = `https://dummyimage.com/420x260/${item.imageColor}/${item.imageColor}`;
   newItem.querySelector("img").src = src;
   newItem.querySelector("h2").textContent = item.name;
   newItem.querySelector("h3").textContent = item.category;
-  newItem.querySelector("p").textContent = `$${item.priceCents / 100}.00`;
-  newItem.querySelector(".cart-item").id = item.id;
-
+  newItem.querySelector("p").textContent = displayAmount(item.priceCents);
+  newItem.querySelector(".store-item").id = item.id;
   storeItems.appendChild(newItem);
 }
 
 storeItems.addEventListener("click", (e) => {
   if (!e.target.matches("button")) return;
-  addItemToCart(e.target.closest(".cart-item").id);
+  addItemToCart(e.target.closest(".store-item").id);
 });
 
 function addItemToCart(itemId) {
@@ -30,6 +32,10 @@ function addItemToCart(itemId) {
   } else {
     cartItems[itemId] += 1;
   }
-
-  console.log(cartItems);
+  localStorage.setItem("cart", JSON.stringify(cartItems));
+  renderCart();
 }
+
+//Initialization
+renderCart();
+deleteCartItemHandler();
